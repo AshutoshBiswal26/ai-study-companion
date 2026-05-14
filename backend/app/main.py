@@ -3,9 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
 
-from backend.app.services.pdf_service import (
+from app.services.pdf_service import (
     extract_text_from_pdf,
     chunk_text
+)
+
+from app.services.embedding_service import (
+    generate_embeddings
+)
+
+from app.services.vector_store import (
+    store_chunks,
+    search_chunks
 )
 
 app = FastAPI()
@@ -30,7 +39,10 @@ def home():
 
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file_path = os.path.join(
+        UPLOAD_FOLDER,
+        file.filename
+    )
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -39,10 +51,20 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     chunks = chunk_text(text)
 
+    embeddings = generate_embeddings(chunks)
+
+    store_chunks(chunks, embeddings)
+
     return {
-        "filename": file.filename,
-        "message": "PDF processed successfully",
-        "total_characters": len(text),
-        "total_chunks": len(chunks),
-        "sample_chunk": chunks[0] if chunks else ""
+        "message": "PDF embedded successfully",
+        "total_chunks": len(chunks)
     }
+
+
+@app.get("/search")
+def search(query: str):
+    query_embedding = generate_embeddings([query])[0]
+
+    results = search_chunks(query_embedding)
+
+    return results
