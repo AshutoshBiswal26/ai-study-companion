@@ -23,7 +23,9 @@ from app.services.vector_store import (
 
 # Gemma / Ollama
 from app.services.llm_service import (
-    generate_answer
+    generate_answer,
+    generate_summary,
+    generate_quiz_questions
 )
 
 app = FastAPI()
@@ -82,7 +84,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     }
 
 
-# Semantic search route
+# Semantic Search Route
 @app.get("/search")
 def search(query: str):
 
@@ -120,4 +122,44 @@ def ask_question(question: str):
         "question": question,
         "answer": answer,
         "context_used": retrieved_chunks
+    }
+
+
+# Summary Route
+@app.post("/summary")
+def summarize_document():
+
+    results = search_chunks(
+        generate_embeddings(["summary"])[0],
+        top_k=5
+    )
+
+    retrieved_chunks = results["documents"][0]
+
+    context = "\n\n".join(retrieved_chunks)
+
+    summary = generate_summary(context)
+
+    return {
+        "summary": summary
+    }
+
+
+# Quiz Generation Route
+@app.post("/quiz")
+def generate_quiz():
+
+    results = search_chunks(
+        generate_embeddings(["quiz"])[0],
+        top_k=5
+    )
+
+    retrieved_chunks = results["documents"][0]
+
+    context = "\n\n".join(retrieved_chunks)
+
+    quiz = generate_quiz_questions(context)
+
+    return {
+        "quiz": quiz
     }

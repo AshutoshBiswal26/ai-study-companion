@@ -16,6 +16,10 @@ function App() {
 
   const [loading, setLoading] = useState(false)
 
+  const [summary, setSummary] = useState('')
+
+  const [quiz, setQuiz] = useState('')
+
 
   // Upload PDF
   const handleUpload = async () => {
@@ -78,6 +82,52 @@ function App() {
   }
 
 
+  // Generate Summary
+  const handleSummary = async () => {
+
+    setLoading(true)
+
+    try {
+
+      const response = await axios.post(
+        'http://127.0.0.1:8000/summary'
+      )
+
+      setSummary(response.data.summary)
+
+    } catch (error) {
+
+      console.error(error)
+
+    }
+
+    setLoading(false)
+  }
+
+
+  // Generate Quiz
+  const handleQuiz = async () => {
+
+    setLoading(true)
+
+    try {
+
+      const response = await axios.post(
+        'http://127.0.0.1:8000/quiz'
+      )
+
+      setQuiz(response.data.quiz)
+
+    } catch (error) {
+
+      console.error(error)
+
+    }
+
+    setLoading(false)
+  }
+
+
   return (
     <div className="app">
 
@@ -121,6 +171,18 @@ function App() {
           Ask AI
         </button>
 
+        <div className="feature-buttons">
+
+          <button onClick={handleSummary}>
+            Generate Summary
+          </button>
+
+          <button onClick={handleQuiz}>
+            Generate Quiz
+          </button>
+
+        </div>
+
       </div>
 
 
@@ -142,6 +204,36 @@ function App() {
           <h2>Answer</h2>
 
           <p>{answer}</p>
+
+        </div>
+
+      )}
+
+
+      {/* Summary */}
+
+      {summary && (
+
+        <div className="answer-box">
+
+          <h2>Document Summary</h2>
+
+          <p>{summary}</p>
+
+        </div>
+
+      )}
+
+
+      {/* Quiz */}
+
+      {quiz && (
+
+        <div className="answer-box">
+
+          <h2>Quiz Questions</h2>
+
+          <p>{quiz}</p>
 
         </div>
 

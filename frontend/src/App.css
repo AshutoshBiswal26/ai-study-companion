@@ -40,6 +40,7 @@ textarea {
 
 button {
   margin-top: 15px;
+  margin-right: 10px;
   padding: 10px 20px;
   border: none;
   background-color: black;
@@ -59,4 +60,15 @@ button {
   margin-top: 12px;
   border-radius: 6px;
   font-size: 14px;
+}
+
+.feature-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.answer-box h2,
+.sources-box h2 {
+  margin-bottom: 15px;
 }
